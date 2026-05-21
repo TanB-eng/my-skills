@@ -1,0 +1,4 @@
+interface:
+  display_name: "BoT_eng"
+  short_description: "Docs-driven serial module workflow"
+  default_prompt: "Use $bot-eng to plan and execute a large project with docs-driven serial module development."
