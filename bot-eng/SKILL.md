@@ -256,7 +256,7 @@ Invoke `$openspec` for the current module.
 2. Use `/opsx:new <change-id>` to create the module change.
 3. Use `/opsx:continue <change-id>` to create artifacts in dependency order, or `/opsx:ff <change-id>` only when the module is already clear and straightforward.
 4. Ensure the OpenSpec proposal/spec/design/tasks are consistent with the global docs and module charter.
-5. Do not start `/opsx:apply` while unresolved questions, contract ambiguity, or missing acceptance criteria remain.
+5. Do not start `/opsx:apply` while unresolved questions, contract ambiguity, missing acceptance criteria, or missing user approval remain.
 
 The OpenSpec artifacts must cover:
 
@@ -268,7 +268,35 @@ The OpenSpec artifacts must cover:
 - testing and regression scope
 - migration or rollback needs where applicable
 
-### 4. Implement Through OpenSpec
+### 4. Manual Implementation Approval Gate
+
+After OpenSpec creates the module tasks, stop. Present the implementation-ready summary to the user and wait for explicit approval before changing implementation code.
+
+The summary must include:
+
+- OpenSpec change id
+- proposal/spec/design/tasks created or updated
+- final task checklist
+- expected owned files and directories to modify
+- shared contract or global doc changes, if any
+- module tests, integration tests, and cumulative smoke tests to run
+- migration, rollback, or compatibility risks
+- open questions or assumptions
+
+Before the user explicitly approves implementation, allowed actions are limited to refining docs, contracts, OpenSpec artifacts, task lists, and answering questions.
+
+Before approval, do not:
+
+- run `/opsx:apply`
+- write implementation code
+- create or modify database migrations
+- generate production code
+- modify module-owned implementation files
+- mark OpenSpec implementation tasks as complete
+
+Only proceed when the user clearly approves, for example: "confirmed, start implementation" or "tasks approved, continue with code."
+
+### 5. Implement Through OpenSpec
 
 Use `/opsx:apply <change-id>` to execute the approved tasks.
 
@@ -282,7 +310,7 @@ During implementation:
 6. Commit after each completed task group, with the module name and OpenSpec change id in the commit message. Do not leave a whole module's work in a single uncommitted pile.
 7. Run the full cumulative smoke suite and affected integration tests before module completion.
 
-### 5. Verify and Reconcile
+### 6. Verify and Reconcile
 
 Use `/opsx:verify <change-id>` before declaring the module complete.
 
@@ -303,7 +331,7 @@ Then reconcile durable documentation:
 3. Update `docs/decisions.md` with durable product, architecture, contract, or technology decisions.
 4. Update `docs/architecture.md`, `docs/tech-stack.md`, or `docs/PRD.md` only when project-wide truth changed.
 
-### 6. Sync, Archive, and Handoff
+### 7. Sync, Archive, and Handoff
 
 After reconciliation:
 
@@ -392,13 +420,13 @@ Use $bot-eng to validate docs/PRD.md, docs/architecture.md, and docs/tech-stack.
 Module start:
 
 ```text
-Use $bot-eng and $openspec. Read docs/PRD.md, docs/architecture.md, docs/tech-stack.md, docs/progress.md, docs/decisions.md, and docs/modules/<module>.md. Current context handles only this module. Recover any interrupted Git/OpenSpec state, then refine the module charter. Do not code yet. Confirm responsibilities, non-responsibilities, owned data, owned files, public contracts, one-way dependencies, tests, acceptance criteria, and module size. After the boundary gate passes, start an explicit OpenSpec change for this module.
+Use $bot-eng and $openspec. Read docs/PRD.md, docs/architecture.md, docs/tech-stack.md, docs/progress.md, docs/decisions.md, and docs/modules/<module>.md. Current context handles only this module. Recover any interrupted Git/OpenSpec state, then refine the module charter. Do not code yet. Confirm responsibilities, non-responsibilities, owned data, owned files, public contracts, one-way dependencies, tests, acceptance criteria, and module size. After the boundary gate passes, start an explicit OpenSpec change for this module. After OpenSpec creates proposal/spec/design/tasks, stop and wait for my explicit approval before running /opsx:apply or writing implementation code.
 ```
 
 Module implementation:
 
 ```text
-Use $bot-eng and $openspec. Continue the current module's explicit OpenSpec change. Implement through /opsx:apply, keep tasks current, commit per completed task group, and modify only module-owned files plus approved contracts/docs. Run module tests, affected integration tests, and the full cumulative smoke suite, then check the boundary diff against owned files. Then use /opsx:verify, reconcile docs/modules/<module>.md, docs/progress.md, and docs/decisions.md, sync specs when needed, and archive only after all gates pass.
+Use $bot-eng and $openspec. Continue the current module's explicit OpenSpec change only after I have explicitly approved the generated OpenSpec tasks and implementation summary. Implement through /opsx:apply, keep tasks current, commit per completed task group, and modify only module-owned files plus approved contracts/docs. Run module tests, affected integration tests, and the full cumulative smoke suite, then check the boundary diff against owned files. Then use /opsx:verify, reconcile docs/modules/<module>.md, docs/progress.md, and docs/decisions.md, sync specs when needed, and archive only after all gates pass.
 ```
 
 ## Completion Check
@@ -407,6 +435,7 @@ Before claiming a module is complete, verify:
 
 - the module was executed through an explicit OpenSpec change
 - OpenSpec proposal/spec/design/tasks reflect the implemented module
+- the user explicitly approved the OpenSpec tasks and implementation summary before `/opsx:apply`
 - `/opsx:verify` completed successfully or any accepted exception is documented
 - module acceptance criteria pass
 - relevant tests ran and results are known

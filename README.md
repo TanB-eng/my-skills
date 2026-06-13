@@ -232,6 +232,7 @@ Use $bot-eng and $openspec。
 /opsx:explore
 /opsx:new module-01-user-auth
 /opsx:continue module-01-user-auth
+暂停，展示 OpenSpec tasks 和实现摘要，等待人工确认
 /opsx:apply module-01-user-auth
 /opsx:verify module-01-user-auth
 /opsx:sync module-01-user-auth
@@ -240,12 +241,17 @@ Use $bot-eng and $openspec。
 
 模块已经非常明确时，可以用 `/opsx:ff` 快速生成规划工件。
 
+注意：`/opsx:continue` 或 `/opsx:ff` 生成 proposal、spec、design、tasks 之后，必须暂停。AI 需要先展示 change id、任务清单、预计修改文件、契约变化、测试计划和风险点，等待你明确确认后，才能进入 `/opsx:apply` 写实现代码。
+
 实施提示词：
 
 ```text
 Use $bot-eng and $openspec。
 
-继续当前模块的 OpenSpec change，通过 /opsx:apply 执行任务。
+继续当前模块的 OpenSpec change。
+只有在我已经明确确认 OpenSpec tasks 和实现摘要之后，
+才可以通过 /opsx:apply 执行任务。
+
 只修改当前模块拥有的文件以及经过批准的契约和文档。
 
 每完成一组可验证任务就运行测试并提交 Git。
@@ -261,6 +267,7 @@ Use $bot-eng and $openspec。
 一个模块只有同时满足以下条件才算完成：
 
 - OpenSpec proposal、spec、design 和 tasks 与实现一致。
+- 进入 `/opsx:apply` 前，用户已经明确确认 OpenSpec tasks 和实现摘要。
 - `/opsx:verify` 通过。
 - 模块验收标准通过。
 - 模块测试和相关集成测试通过。
