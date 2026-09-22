@@ -1,54 +1,69 @@
 # BoT_eng
 
-`BoT_eng` 是一套面向中大型 AI 辅助软件项目的文档驱动、串行模块开发方法。
+`BoT_eng` 是一套面向多模块、长期迭代或上下文较复杂项目的自适应、规格优先 MVP 开发方法。
 
-它先用全局文档确定产品、架构和技术约束，再按业务能力拆分模块。每个模块使用一个独立对话，并通过 OpenSpec 完成规格、设计、任务、实现、验证和归档。
+它先让人与 AI 共同确认产品方向、MVP、架构和技术路线，再按业务模块串行实现。每个模块同步补充测试，产品行为或架构事实发生变化时同步文档。OpenSpec、Superpowers 和 Spec Kit 都是按需工具，不再是每个项目的强制依赖。
 
-显示名称是 `BoT_eng`，Skill 文件夹和实际调用名称遵循 Codex 命名规范，使用 `bot-eng` 和 `$bot-eng`。
+显示名称是 `BoT_eng`，实际 Skill 名称和调用方式为 `bot-eng`、`$bot-eng`。
 
-## 适用场景
-
-- 项目包含多个业务模块，单次对话难以完成。
-- 希望降低模块之间的耦合度。
-- 希望出现错误时能快速定位到具体模块。
-- 希望一个模块使用一个独立对话，减少上下文污染。
-- 希望通过文件和 Git 恢复进度，不依赖 AI 的隐藏记忆。
-- 希望后续模块不会静默破坏已经完成的模块。
-
-不适合一次性脚本、很小的功能修改或无需长期维护的实验。
-
-## 核心方法
+## 核心理念
 
 ```text
-项目想法
--> 澄清需求
--> 建立并验证全局文档
--> 按业务能力拆分模块
--> 一个模块一个新对话
--> 完善模块边界
--> 使用 OpenSpec 完成模块
--> 测试、验证、同步和归档
--> 更新项目记忆
--> 进入下一个模块
+先把方向想清楚
+-> 确认 MVP 与架构基线
+-> 按业务能力拆模块
+-> 串行实现最小可用功能
+-> 每个模块同步测试
+-> 跑通核心用户路径
+-> 再根据真实体验打磨
 ```
 
-顶层模块按业务能力拆分，例如：
+关键原则：
 
-```text
-user-auth
-file-upload
-document-parse
-knowledge-base
-ai-chat
-admin
-deployment
-```
+- 规格确认前不急着施工。
+- 顶层按业务能力拆分，不按前端、后端、数据库分层拆分。
+- 默认使用能可靠交付的最轻流程。
+- 默认一次只施工一个业务模块，不让多个模块并行写共享代码；独立研究或审查只有在不改变共享实现状态时才可并行。
+- 代码和测试一起完成。
+- 只在产品行为、架构、公开接口或验收标准变化时同步权威文档。
+- 先证明 MVP 核心价值，再投入 UI 打磨、少见边界和未来规模设计。
 
-不要把前端、后端、数据库、API 直接作为顶层业务模块。每个业务模块内部再覆盖前端、后端、Service、数据库、API 和测试。
+## 三种模式
 
-## 项目文档结构
+### MVP mode（默认）
 
-使用 `BoT_eng` 的项目建议采用：
+适合从零构建 MVP、简单或中等复杂模块、低风险迭代。
+
+- 建立产品和架构基线。
+- 按模块串行实现并运行针对性测试。
+- 模块文档和契约按需创建。
+- 不强制 OpenSpec、Superpowers、逐任务审批或全量文档。
+- 不增加逐任务审批；遇到必要授权、高影响未决问题或基线需要改变时暂停询问。
+
+### Controlled mode
+
+适合复杂模块、重要或尚不稳定的跨模块接口、数据迁移、兼容性要求或返工成本较高的变更。
+
+仅仅存在一个小而稳定的跨模块接口，不足以触发升级；安全边界、不可逆操作、迁移、兼容性或高返工成本才是更强的升级信号。
+
+- 为当前模块补充必要的模块说明和公开契约。
+- 使用 OpenSpec 管理 proposal、spec、design 和 tasks。
+- OpenSpec 生成任务后暂停，等待用户确认，再进入代码实现。
+
+### Strict mode
+
+仅在用户明确要求，或项目具有合规、安全、兼容、不可逆操作等高风险条件时使用。
+
+- 使用更详细的规格、审批、分阶段交付检查点和回归验证。
+- 启用前应说明额外时间与上下文成本。
+
+AI 应说明当前选择的模式和理由。只有存在明确风险或用户主动要求时，才能从 MVP mode 升级到更重流程。
+
+对于已有项目的小功能或 Bug，不重新跑完整全局设计；先读取现有规格和代码，在原架构内做最小必要修改。
+
+## 默认项目文档
+
+典型的中大型项目可以使用：
 
 ```text
 docs/
@@ -57,52 +72,228 @@ docs/
   tech-stack.md
   progress.md
   decisions.md
-
-  contracts/
-    <public-contract>.md
-
-  modules/
-    00-project-setup.md
-    01-<business-module>.md
-    02-<business-module>.md
-
-openspec/
-  specs/
-  changes/
 ```
 
-文件职责：
-
-| 内容 | 权威来源 |
+| 文件 | 作用 |
 | --- | --- |
-| 产品范围、用户、MVP、非目标 | `docs/PRD.md` |
-| 系统结构、模块关系、数据所有权 | `docs/architecture.md` |
-| 技术约束和技术选型 | `docs/tech-stack.md` |
-| 跨模块公开接口 | `docs/contracts/*` |
-| 模块边界和最终摘要 | `docs/modules/<module>.md` |
-| 当前模块变更过程 | `openspec/changes/<change-id>/` |
-| 同步后的稳定行为规格 | `openspec/specs/*` |
-| 当前 OpenSpec 任务状态 | OpenSpec tasks |
-| 项目里程碑和下一步 | `docs/progress.md` |
-| 长期决策及原因 | `docs/decisions.md` |
+| `PRD.md` | 产品问题、用户、核心路径、MVP、非目标和验收标准 |
+| `architecture.md` | 架构骨架、模块关系、依赖、数据归属和跨模块规则 |
+| `tech-stack.md` | 技术选型、限制和理由 |
+| `progress.md` | 当前状态、完成内容、测试、阻塞点和下一步 |
+| `decisions.md` | 以后容易被反复讨论的重要决定和原因 |
 
-## 依赖
+不要在项目一开始机械创建空文档。只有文档确实承载有用信息时才创建。
 
-模块开发阶段需要：
+小型 MVP 可以只使用 `docs/spec.md` 和简短的 `docs/progress.md`，把产品、架构和技术选择放在同一个规格文件中。内容增长到难以维护时再拆分。
 
-- `bot-eng`：负责全局文档、模块边界、串行顺序和跨对话记忆。
-- `openspec`：负责每个模块的 proposal、spec、design、tasks、apply、verify、sync 和 archive。
+使用合并的 `docs/spec.md` 时，后续产品、架构或技术事实变化，应更新该文件中对应章节，不要因为缺少拆分文件而漏记。
 
-可选增强：
+以下文件按需创建：
 
-- Superpowers：用于需求探索、TDD、调试和完成前验证。
-- Spec Kit：可用于项目级规格工作，但不要与 OpenSpec 在同一模块内重复维护两套实施流程。
+```text
+docs/modules/<module>.md
+docs/contracts/<contract>.md
+openspec/changes/<change-id>/
+```
 
-如果项目要求严格遵循本 Skill，而 `$openspec` 或 OpenSpec CLI 不可用，应先完成安装，不要静默跳过模块规格流程。
+- 模块说明用于复杂模块的边界、验收标准和状态交接。
+- 契约只用于有意义的跨模块公开接口。
+- OpenSpec 只用于值得采用更严格变更流程的模块。
+
+## 使用流程
+
+### 1. 共同确定项目基线
+
+启动提示词：
+
+```text
+Use $bot-eng in MVP mode. Do not write code yet.
+Help me clarify the product goal, users, core journey, MVP, non-goals,
+architecture options, technology route, modules, risks, and acceptance criteria.
+Present a concise project baseline for my review, then create only the useful docs.
+```
+
+AI 应与你反复讨论并梳理：
+
+- 产品解决的问题和目标用户
+- 核心用户路径
+- MVP 必须具备的能力
+- 明确暂不实现的内容
+- 架构方案和技术路线
+- 业务模块、依赖和实现顺序
+- 风险、假设和验收标准
+
+提交你确认前，AI 还应进行一次对抗式自审，主动寻找核心路径断裂、隐藏假设、需求矛盾、模块职责重叠、循环依赖、MVP 夹带非必要功能和过度技术设计。发现真实问题时先修订规格。只有你明确批准展示过的基线后，才进入实现。
+
+你调整方向后，AI 应先同步相关规格，并说明哪些模块、测试或验收假设受到影响，再继续讨论或施工。
+
+确认前不写产品代码。确认后可记录：
+
+```text
+Status: MVP baseline approved
+Version: 0.1
+```
+
+### 2. 按业务能力拆模块
+
+推荐：
+
+```text
+user-auth
+file-management
+document-parse
+knowledge-retrieval
+ai-chat
+admin
+```
+
+不建议把顶层模块直接拆成：
+
+```text
+frontend
+backend
+database
+components
+api
+```
+
+一个合适的模块应具有单一业务目标、明确职责、清晰数据归属、小型公开接口和可独立验证的结果。
+
+每类持久化数据或有状态能力应有一个明确归属模块。其他模块通过公开接口写入，不直接依赖其私有表或内部 Service。
+
+项目初始化、部署、可观测性、共享设计系统等横切技术基础可以作为明确的前置工作或共享基础设施，但不冒充用户价值模块；只在当前 MVP 确实需要时建立，并保持单一归属和小型公开边界。
+
+只有当前模块的测试、进度记录、公开输出和必要交接事实都已更新，才能进入下一个模块。如果后续模块必须读取前一个模块的内部实现，应先修复边界或契约。
+
+### 3. 串行实现 MVP
+
+模块提示词：
+
+```text
+Use $bot-eng. Continue the next business module in MVP mode.
+Read the current project docs and repository state, confirm the module boundary,
+implement the smallest useful slice, add focused tests, run relevant checks,
+and update progress. Do not add routine approval gates; pause for required
+authorization or if the product or architecture baseline must change.
+```
+
+每个模块执行：
+
+```text
+读取当前规格和代码
+-> 确认模块目标、边界和依赖
+-> 判断是否需要升级流程
+-> 实现推动核心路径的最小功能
+-> 补充测试
+-> 运行针对性测试和必要集成测试
+-> 修复失败
+-> 更新进度和发生变化的权威文档
+-> 进入下一模块
+```
+
+“一个模块一个对话”是推荐的上下文组织方式，不是制造额外文档和审批的理由。
+
+### 4. 按风险升级到 OpenSpec
+
+出现以下情况时，可以切换到 Controlled mode：
+
+- 模块包含多项复杂业务规则
+- 需要新增或修改重要、尚不稳定或有兼容性影响的公开契约
+- 涉及数据库迁移或兼容性
+- 存在多个差异明显的设计方向
+- 失败或返工成本较高
+- 需要清晰的变更历史
+
+提示词：
+
+```text
+Use $bot-eng with OpenSpec Controlled mode for this module.
+Explore the design, create the smallest useful OpenSpec plan,
+show me the tasks, file scope, risks, and tests,
+then wait for my explicit approval before writing implementation code.
+```
+
+典型流程：
+
+```text
+/opsx:explore       可选：需求或风险仍需探索
+/opsx:new           创建变更
+/opsx:continue      创建下一个必要工件
+/opsx:ff            仅在需求已很清晰时快速生成规划工件
+暂停并等待人工确认
+/opsx:apply         实现已批准的任务
+/opsx:verify        验证实现与规格一致
+/opsx:sync          必要时同步稳定规格
+/opsx:archive       归档已完成变更
+```
+
+OpenSpec 生成 tasks 后，AI 必须先展示任务、文件范围、接口和数据影响、测试计划、风险和未决假设。只有用户明确批准后，才能执行 `/opsx:apply` 或写实现代码。
+
+OpenSpec 不可用时，低风险模块可以继续使用 MVP mode；高风险变更不能静默降级，应改用等价的简洁计划与人工确认，或询问用户如何继续。
+
+### 5. MVP 整体验收
+
+提示词：
+
+```text
+Review the MVP against the approved PRD and core user journey.
+Run the relevant tests and build checks, identify missing behavior and known gaps,
+and separate must-fix issues from post-MVP polish.
+```
+
+MVP 完成应满足：
+
+- 核心用户路径可以端到端运行。
+- 已确认的 MVP 验收标准满足。
+- 重要失败路径有合理反馈。
+- 测试和构建检查提供可复验证据。
+- UI 打磨、增强功能和非 MVP 工作被明确列入后续。
+
+## 文档同步规则
+
+文档描述当前事实，不记录每次内部改动。
+
+必须同步：
+
+- 产品范围、用户或验收标准变化
+- 模块边界、依赖、数据归属或系统结构变化
+- 技术路线发生重要变化
+- 跨模块公开契约变化
+- 项目阶段、测试状态或下一步变化
+- 形成以后不应反复推翻的重要决定
+
+通常无需同步全局文档：
+
+- 私有函数改名
+- 普通内部重构
+- CSS 微调
+- 不改变外部行为的文件整理
+- 普通测试实现细节
+
+## 测试策略
+
+测试深度与风险匹配：
+
+- 本地行为使用单元或功能测试。
+- 重要模块边界使用集成测试。
+- 每个关键 MVP 能力保留少量高价值冒烟路径。
+- MVP 完成前验证完整核心用户路径、可用测试套件和构建。
+
+如果项目尚无自动测试框架，先采用当前能提供的最小可靠验证并说明限制。只有收益值得时才引入测试框架，不要让一个小型 MVP 模块变成测试工具搭建项目。
+
+无需在每个微小修改后强制运行全量回归，但不能在没有验证证据时宣称模块或 MVP 完成。
+
+## 可选工具
+
+- Superpowers：需求探索、TDD、调试或高风险完成验证。
+- OpenSpec：复杂模块和高影响变更。
+- Spec Kit：用户明确需要完整项目级 Spec-Driven Development 时。
+
+不要因为工具已安装就自动调用，也不要为同一个变化同时运行两套重叠规格流程。
 
 ## 下载与安装
 
-### 方法一：克隆整个仓库
+### 克隆仓库
 
 ```powershell
 git clone https://github.com/TanB-eng/my-skills.git
@@ -130,16 +321,9 @@ mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
 cp -R my-skills/bot-eng "${CODEX_HOME:-$HOME/.codex}/skills/bot-eng"
 ```
 
-安装后重新打开 Codex 会话，让 Skill 被重新发现。
+也可以在 GitHub 点击 `Code` -> `Download ZIP`，解压后复制完整的 `bot-eng` 文件夹。
 
-### 方法二：下载 ZIP
-
-1. 打开本仓库。
-2. 点击 `Code`。
-3. 选择 `Download ZIP`。
-4. 解压后，将整个 `bot-eng` 文件夹复制到 Codex 的 `skills` 目录。
-
-不要只复制 `SKILL.md`。应保留完整结构：
+保留完整结构：
 
 ```text
 bot-eng/
@@ -148,187 +332,9 @@ bot-eng/
     openai.yaml
 ```
 
-## 检查是否安装成功
-
-在新对话中输入：
-
-```text
-Use $bot-eng，介绍你的项目开发流程。
-```
-
-如果 Codex 能识别 `$bot-eng` 并读取 Skill，说明安装成功。
-
-## 完整使用流程
-
-### 1. 启动项目并生成全局文档
-
-```text
-Use $bot-eng。
-
-先不要写代码。探索并澄清我的项目目标、目标用户、MVP、
-非目标、核心用户路径、业务模块、数据流、技术风险和验收标准。
-
-然后创建：
-docs/PRD.md
-docs/architecture.md
-docs/tech-stack.md
-docs/progress.md
-docs/decisions.md
-```
-
-### 2. 验证全局文档
-
-```text
-Use $bot-eng 验证 docs/PRD.md、docs/architecture.md
-和 docs/tech-stack.md。
-
-检查产品功能是否都有模块承接、模块是否有产品依据、
-数据是否只有一个所有者、依赖是否单向、是否存在循环依赖、
-跨模块契约是否完整，以及第一个模块是否可以开始。
-```
-
-验证通过后，文档可以标记：
-
-```text
-Status: Approved for Module 1
-Version: 0.1
-```
-
-### 3. 为当前模块开启新对话
-
-每个模块使用一个独立对话，并读取：
-
-```text
-docs/PRD.md
-docs/architecture.md
-docs/tech-stack.md
-docs/progress.md
-docs/decisions.md
-docs/modules/<current-module>.md
-```
-
-如果当前模块依赖其他模块，再读取对应的 `docs/contracts/*`。
-
-启动提示词：
-
-```text
-Use $bot-eng and $openspec。
-
-当前对话只负责 docs/modules/<module>.md 对应的模块。
-读取全局文档、当前模块文件、Git 状态和 OpenSpec 状态。
-
-先恢复上下文并完善模块边界，不要直接写代码。
-确认职责、非职责、数据所有权、文件所有权、公开契约、
-单向依赖、测试、验收标准和模块尺寸。
-
-边界检查通过后，为该模块建立明确的 OpenSpec change。
-```
-
-### 4. 使用 OpenSpec 完成模块
-
-典型流程：
-
-```text
-/opsx:explore
-/opsx:new module-01-user-auth
-/opsx:continue module-01-user-auth
-暂停，展示 OpenSpec tasks 和实现摘要，等待人工确认
-/opsx:apply module-01-user-auth
-/opsx:verify module-01-user-auth
-/opsx:sync module-01-user-auth
-/opsx:archive module-01-user-auth
-```
-
-模块已经非常明确时，可以用 `/opsx:ff` 快速生成规划工件。
-
-注意：`/opsx:continue` 或 `/opsx:ff` 生成 proposal、spec、design、tasks 之后，必须暂停。AI 需要先展示 change id、任务清单、预计修改文件、契约变化、测试计划和风险点，等待你明确确认后，才能进入 `/opsx:apply` 写实现代码。
-
-实施提示词：
-
-```text
-Use $bot-eng and $openspec。
-
-继续当前模块的 OpenSpec change。
-只有在我已经明确确认 OpenSpec tasks 和实现摘要之后，
-才可以通过 /opsx:apply 执行任务。
-
-只修改当前模块拥有的文件以及经过批准的契约和文档。
-
-每完成一组可验证任务就运行测试并提交 Git。
-完成后运行模块测试、集成测试和完整累积冒烟测试，
-检查文件修改是否越界，再执行 /opsx:verify。
-
-验证通过后更新模块文件、progress.md 和 decisions.md，
-必要时同步规格，最后归档 change。
-```
-
-### 5. 完成模块并进入下一模块
-
-一个模块只有同时满足以下条件才算完成：
-
-- OpenSpec proposal、spec、design 和 tasks 与实现一致。
-- 进入 `/opsx:apply` 前，用户已经明确确认 OpenSpec tasks 和实现摘要。
-- `/opsx:verify` 通过。
-- 模块验收标准通过。
-- 模块测试和相关集成测试通过。
-- 当前模块的核心场景已加入累积冒烟测试。
-- 完整累积冒烟测试通过。
-- Git 文件边界检查通过。
-- `progress.md` 和 `decisions.md` 已更新。
-- 模块文件记录最终行为和归档的 change ID。
-- 必要的规格已经同步，OpenSpec change 已归档。
-
-完成后开一个新对话，再处理下一个模块。
-
-## 关键约束
-
-### 数据所有权
-
-每个数据库表或持久化数据结构只能有一个归属模块。跨模块写入必须经过归属模块的公开 API 或 Service。
-
-### 单向依赖
-
-后面的模块只能依赖前面已经完成的模块。禁止循环依赖。
-
-### 公开契约
-
-模块只能依赖其他模块发布在 `docs/contracts/*` 中的公开接口和类型，不能依赖内部实现。
-
-### 文件所有权
-
-每个模块声明自己拥有的文件和目录。模块完成前使用 Git diff 检查是否修改了边界外文件。
-
-### 累积回归
-
-每个模块留下少量高价值的自动化冒烟测试。后续任何模块完成前，都要运行所有已完成模块的冒烟测试。
-
-## 已完成模块需要返工
-
-不要从其他模块的对话里顺手修改已经归档的模块。
-
-应当：
-
-```text
-暂停当前模块并提交
--> 更新 progress.md
--> 为旧模块打开独立修复对话
--> 创建新的 OpenSpec fix change
--> 分析下游影响
--> 修复并运行完整回归测试
--> 更新文档
--> sync 和 archive
--> 恢复原模块
-```
-
-change ID 示例：
-
-```text
-module-01-user-auth-fix-session-expiry
-```
+安装或更新后重新打开 Codex 会话。
 
 ## 更新本地 Skill
-
-如果已经克隆仓库：
 
 ```powershell
 Set-Location .\my-skills
@@ -343,17 +349,6 @@ $skillRoot = if ($env:CODEX_HOME) {
 $target = Join-Path $skillRoot "bot-eng"
 New-Item -ItemType Directory -Force -Path $target | Out-Null
 Copy-Item ".\bot-eng\*" $target -Recurse -Force
-```
-
-更新后重新打开 Codex 会话。
-
-## 仓库内容
-
-```text
-bot-eng/
-  SKILL.md
-  agents/
-    openai.yaml
 ```
 
 Skill 源文件：[bot-eng/SKILL.md](bot-eng/SKILL.md)
