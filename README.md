@@ -38,7 +38,12 @@
 - 按模块串行实现并运行针对性测试。
 - 模块文档和契约按需创建。
 - 不强制 OpenSpec、Superpowers、逐任务审批或全量文档。
-- 不增加逐任务审批；遇到必要授权、高影响未决问题或基线需要改变时暂停询问。
+- 新项目由用户明确批准 MVP 基线；已有项目使用经过验证的现有基线。这是默认唯一的实施前人工关口。
+- 模块切换、新对话、任务摘要和低风险实现选择都不是审批关口。
+
+基线批准或验证后，AI 默认自动串行推进低风险模块。每个模块开始时只需简短说明“目标、范围、验证方式”，随后直接实现，不等待用户再次确认。
+
+首个可运行纵向切片等关键节点应展示实际结果，让用户有机会尽早纠偏，但默认不停工等待确认；只有用户主动要求检查点时才暂停。
 
 ### Controlled mode
 
@@ -171,10 +176,11 @@ api
 
 ```text
 Use $bot-eng. Continue the next business module in MVP mode.
-Read the current project docs and repository state, confirm the module boundary,
-implement the smallest useful slice, add focused tests, run relevant checks,
-and update progress. Do not add routine approval gates; pause for required
-authorization or if the product or architecture baseline must change.
+Read the current project docs and repository state, check the module boundary,
+briefly state the goal, scope, and verification method, then implement the
+smallest useful slice without waiting for approval. Add focused tests, run
+relevant checks, and update progress. Pause only for required authorization,
+a high-impact unresolved decision, or a product or architecture baseline change.
 ```
 
 每个模块执行：
@@ -192,6 +198,18 @@ authorization or if the product or architecture baseline must change.
 ```
 
 “一个模块一个对话”是推荐的上下文组织方式，不是制造额外文档和审批的理由。
+
+模块换对话前，AI 只需留下简短交接；新对话从已经批准的基线和当前进度直接继续，不重新讨论已经确定的设计，除非新证据表明原设计存在问题。
+
+简单模块不创建详细任务卡、需求编号、追踪表或文件范围清单。只要在对话中用三项说明即可：
+
+```text
+目标：这个模块本轮要产生什么可用结果
+范围：本轮包含和不包含什么
+验证：AI 将运行什么检查，用户最终看到什么
+```
+
+只有缺少这些详细工件会造成明显歧义、协作风险、审计要求或高昂返工时，才补充任务卡、追踪关系或升级到 OpenSpec。
 
 ### 4. 按风险升级到 OpenSpec
 
@@ -248,6 +266,8 @@ MVP 完成应满足：
 - 重要失败路径有合理反馈。
 - 测试和构建检查提供可复验证据。
 - UI 打磨、增强功能和非 MVP 工作被明确列入后续。
+
+AI 完成串行施工和验证后，应集中展示核心用户路径、测试证据和已知缺口，由用户进行一次最终 MVP 验收；无需在中间逐模块重复验收。
 
 ## 文档同步规则
 

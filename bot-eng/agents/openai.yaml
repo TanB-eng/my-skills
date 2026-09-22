@@ -1,4 +1,4 @@
 interface:
   display_name: "BoT_eng"
   short_description: "Adaptive spec-first MVP development workflow"
-  default_prompt: "Use $bot-eng in MVP mode to shape the project baseline, then build and test the core journey module by module."
+  default_prompt: "Use $bot-eng in MVP mode: establish or confirm the baseline once, then build and test low-risk modules serially without routine approval gates."

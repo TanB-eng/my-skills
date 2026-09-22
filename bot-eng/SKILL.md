@@ -36,7 +36,8 @@ Use for greenfield MVP work, simple or medium modules, and low-risk changes.
 - Implement modules serially with focused tests.
 - Use module notes only when the current module needs them.
 - Do not require OpenSpec, Superpowers, contract documents, or routine per-task approval.
-- Do not add per-task approval gates. Pause for unresolved high-impact decisions, required authorization, or when the agreed baseline no longer works.
+- Treat explicit approval of the presented MVP baseline, or acceptance of an existing usable baseline, as the only default pre-implementation human gate.
+- Do not turn module boundaries, new conversations, task summaries, or low-risk implementation choices into approval gates.
 
 ### Controlled mode
 
@@ -59,6 +60,26 @@ Strict-mode implementation must not begin until the stated approval gates are sa
 Never force Controlled or Strict mode merely because a related skill is installed.
 
 State the selected mode and why. Moving from MVP mode to Controlled or Strict mode requires a concrete risk or an explicit user preference; tell the user before adding the extra process. Moving to a lighter mode must not remove safeguards required by a known risk.
+
+## MVP Interaction Model
+
+After a new MVP baseline is approved or an existing baseline is validated, proceed through low-risk modules without repeatedly asking the user to approve each module, task, file list, or test plan.
+
+At the start of a low-risk module, briefly state:
+
+```text
+Goal
+Scope
+Verification
+```
+
+This is a progress update, not an approval request. Continue implementation unless the user asks to pause or a real escalation condition appears.
+
+Surface runnable results at meaningful checkpoints, especially the first end-to-end slice, so the user can redirect early. Treat the demonstration as feedback opportunity, not a mandatory stop, unless the user requests a checkpoint.
+
+Do not create detailed task cards, requirement IDs, traceability tables, or file-scope manifests for a simple module. Add them only when their absence would create meaningful ambiguity, coordination risk, audit needs, or expensive rework. If a short explanation in the conversation is enough, do not persist another artifact.
+
+Pause for user input only when required authorization is missing, a high-impact decision remains unresolved, the approved product or architecture baseline must change, or Controlled or Strict mode requires its stated gate. After implementation, present the working core journey and verification evidence for final MVP acceptance.
 
 ## Entry Routing
 
@@ -172,7 +193,7 @@ After the baseline is approved, implement the smallest useful vertical slice. Th
 For each module:
 
 1. Read the current global docs, the current module note and relevant contracts if they exist, repository state, and the preceding module's public outputs.
-2. Confirm the module's goal, boundary, dependencies, and acceptance outcome.
+2. Check the module's goal, boundary, dependencies, and acceptance outcome. For a low-risk module, briefly state its goal, scope, and verification method, then continue without waiting for approval.
 3. Create `docs/modules/<module>.md` only if the module needs durable detail beyond `architecture.md`.
 4. Decide whether MVP mode is sufficient or whether this module should be upgraded to Controlled mode.
 5. Implement the smallest behavior that advances the core user journey.
@@ -181,7 +202,7 @@ For each module:
 8. Update `progress.md` and update other docs only when project facts changed.
 9. Move to the next module after the current outcome is usable and evidenced.
 
-One module per context is a default organization technique, not a reason to create a large ceremony. A small module can be completed in one conversation. A large module should be split before implementation or upgraded to Controlled mode.
+One module per context is a default organization technique, not an approval gate or a reason to create a large ceremony. A small module can be completed in one conversation. A large module should be split before implementation or upgraded to Controlled mode. When changing contexts, leave a compact handoff and let the next context continue from the approved baseline without reopening settled design decisions unless new evidence conflicts with them.
 
 Do not start the next module until the active module's tests, progress entry, public outputs, and necessary handoff facts are current. If a later module needs an earlier module's internals, stop and repair the boundary or contract before continuing.
 
