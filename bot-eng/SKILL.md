@@ -36,7 +36,7 @@ Use for greenfield MVP work, simple or medium modules, and low-risk changes.
 - Implement modules serially with focused tests.
 - Use module notes only when the current module needs them.
 - Do not require OpenSpec, Superpowers, contract documents, or routine per-task approval.
-- Treat explicit approval of the presented MVP baseline, or acceptance of an existing usable baseline, as the only default pre-implementation human gate.
+- For a new project, present the baseline and readiness assessment together for one explicit approval before product implementation. For an existing usable baseline, verify it without requesting repeat approval of settled scope.
 - Do not turn module boundaries, new conversations, task summaries, or low-risk implementation choices into approval gates.
 
 ### Controlled mode
@@ -89,7 +89,7 @@ For an existing project with a usable baseline, read and validate the current do
 
 ## Global Design Phase
 
-Do not write product code during this phase. Explore the user's intent, then produce a concise but complete project baseline.
+Explore the user's intent and prepare a concise project baseline before product implementation. Read-only investigation and static interaction sketches belong here. A runnable prototype or feasibility probe before baseline approval needs an explicitly authorized, bounded scope; keep it isolated from production behavior and label its simulated parts. Probe authorization does not approve the MVP implementation.
 
 Discuss:
 
@@ -104,6 +104,8 @@ Discuss:
 - data flow, risks, and unresolved assumptions
 
 Present the proposed direction in plain language so the user can correct it. Do not treat a vague acknowledgement as approval of an unshown document.
+
+Separate user requirements, repository or experimental evidence, and unverified assumptions. Ask only questions whose answers materially affect scope, core interactions, architecture, risk, or acceptance. Resolve technical questions through available evidence first; explain consequential choices to the user. Avoid repeating answered questions or filling a question quota, but do not hide a blocking ambiguity just to stop asking.
 
 Create only the documents that carry useful information. A typical medium or large greenfield project uses:
 
@@ -126,21 +128,39 @@ The files have these roles:
 
 A smaller MVP may combine product, architecture, and technology choices in `docs/spec.md` and keep a short `docs/progress.md`. Split documents only when independent ownership or navigation makes the separation useful.
 
-Do not create empty files or a detailed document for every future module during the global phase. Create module notes and contracts when a module actually needs them.
+Do not create empty files or detailed notes for every future module. Capture the core interactions and necessary interface agreements during baseline design; defer unrelated interfaces and module implementation details.
+
+## Interaction and Interface Design
+
+For a product with unclear user interactions, use a simple sketch, screen outline, or existing UI reference to walk through the core journey. Show the relevant actions, input, result, and important loading, empty, and error states. For a backend or CLI project, use request/response or input/output examples instead. Skip new prototypes when the interactions are already clear; visual polish is not a prerequisite.
+
+Refine the interaction, architecture, and core interface agreements together. Define the exchanges needed by the MVP journey before the frontend and backend implement them; see Core API and Module Contracts below. Account for business rules and data ownership, rather than inventing one endpoint for every button. Technical constraints may require revising the interaction.
+
+Keep interaction details in the existing product spec, or use `docs/design.md` only when separate navigation helps. Preserve existing document names and link to prototypes and interface definitions rather than duplicating them. These are design responsibilities, not mandatory separate agents, documents, or approval stages.
 
 ## Global Baseline Review
 
-Before presenting the baseline for approval, challenge it from an adversarial perspective. Look for a broken core journey, hidden assumptions, contradictory requirements, overlapping modules, circular dependencies, premature abstractions, unnecessary MVP scope, and technology choices that are expensive without supporting the product hypothesis. Revise the baseline when the critique exposes a real weakness.
+Before presenting the baseline for approval, challenge it from an adversarial perspective. Check the core journey against the interaction, interface agreements, and architecture. Look for contradictions, hidden assumptions, overlapping modules, circular dependencies, unnecessary MVP scope, and premature abstractions. Fix substantive gaps, then assess readiness:
 
-Then review the baseline with the user. Check:
+- Value and scope: identify the user, problem, complete core journey, MVP boundaries, and observable acceptance outcomes.
+- Interaction and interfaces: make the core actions and important failure outcomes understandable; define needed exchanges or explain why no separate interface applies.
+- Ownership and feasibility: give each MVP capability and persistent data set an owner, explain dependencies and technology choices, and expose risks that could invalidate the whole MVP.
+- First slice: identify a small runnable outcome, its dependencies, and a concrete way to verify it.
+- Unknowns: distinguish blockers, reversible assumptions with validation plans, and intentionally deferred work.
 
-- every MVP capability has an owner module
-- every module has a product reason
-- the core user journey is end to end and testable
-- the architecture is sufficient for the MVP but not designed for imaginary scale
-- technology choices support the architecture and are explainable
-- data ownership and dependency direction are understandable
-- unresolved assumptions are visible
+Report one of these outcomes with evidence from the relevant spec sections, code, documentation, or actual experiments. State when evidence is missing; do not use a completeness score or document count as proof:
+
+| Outcome | Meaning and next step |
+| --- | --- |
+| Ready | Readiness criteria are satisfied; no known MVP viability blocker remains, and the first slice is actionable. Present the baseline for approval. |
+| Ready with assumptions | Remaining assumptions are bounded and reversible. Record what is assumed, how and when it will be tested before dependent work, and the fallback or reassessment trigger; include them in the baseline approval. |
+| Not ready | A material contradiction, untestable core outcome, unclear ownership, or unresolved viability risk blocks product implementation. Name the blocker and the smallest clarification or authorized probe that can resolve it. |
+
+An easy first screen does not offset a critical unknown about the rest of the MVP. Investigate such unknowns before investing in dependent work. Passing this review establishes readiness to attempt implementation, not proven demand, technical success, or user approval.
+
+Keep a compact assessment in `docs/progress.md`: outcome and basis, first slice and verification, blockers or assumptions with validation timing, and the next action. Link to existing facts instead of duplicating them. After fixes, recheck the affected criteria; stop expanding planning when readiness is established.
+
+Run this assessment at the initial baseline and after material baseline changes. A complex Controlled change may use the same criteria locally within its existing plan and approval. Do not repeat the full review or request approval merely because a module or conversation changes.
 
 After the user explicitly approves the presented baseline, record a marker such as:
 
@@ -149,7 +169,7 @@ Status: MVP baseline approved
 Version: 0.1
 ```
 
-This approval authorizes implementation of the agreed MVP. It does not authorize silent changes to product scope or architecture later.
+This approval covers the presented product scope, interactions, architecture, core interface agreements, and disclosed assumptions. It authorizes implementation of that MVP, not silent scope changes, deployment, or unrelated external actions.
 
 When the user adjusts the direction, update the affected baseline documents before treating the revision as settled. Summarize what changed and what downstream module, test, or acceptance assumptions are affected.
 
@@ -188,19 +208,23 @@ Keep dependencies understandable and preferably one-way. If two modules need eac
 
 ## MVP Implementation Loop
 
-After the baseline is approved, implement the smallest useful vertical slice. The exact order depends on the project, but normally follows dependency order and user value rather than technical layers.
+After the baseline is approved, implement the smallest useful vertical slice. Follow dependency order and user value; finish each module's current MVP outcome, not every future feature, so the core journey becomes runnable early.
 
 For each module:
 
-1. Read the current global docs, the current module note and relevant contracts if they exist, repository state, and the preceding module's public outputs.
-2. Check the module's goal, boundary, dependencies, and acceptance outcome. For a low-risk module, briefly state its goal, scope, and verification method, then continue without waiting for approval.
-3. Create `docs/modules/<module>.md` only if the module needs durable detail beyond `architecture.md`.
+1. Read the current baseline and interactions, module note and relevant contracts if present, repository state, and dependency modules' public outputs.
+2. Check the module's goal, boundary, dependencies, acceptance outcome, and assumptions due for validation. For a low-risk module, briefly state its goal, scope, and verification method, then continue without waiting for approval.
+3. Create `docs/modules/<module>.md` only if the module needs durable detail beyond the baseline.
 4. Decide whether MVP mode is sufficient or whether this module should be upgraded to Controlled mode.
-5. Implement the smallest behavior that advances the core user journey.
-6. Add or update focused tests for the behavior and important failure paths.
-7. Run the focused tests and relevant integration checks; fix failures before moving on.
+5. Implement the smallest behavior that advances the core journey, using the order described below.
+6. Add or update focused tests alongside implementation for the behavior and important failure paths.
+7. Connect the real components and run focused tests and relevant integration checks, including affected existing behavior; fix failures before moving on.
 8. Update `progress.md` and update other docs only when project facts changed.
 9. Move to the next module after the current outcome is usable and evidenced.
+
+For a UI-driven module with understood technical dependencies, the default order is frontend interaction (using clearly identified mock data if needed), backend logic and persistence, then real integration. Keep both sides aligned with the agreed interface and test while building. Do not finish all modules' frontend implementations before integrating any backend.
+
+When the main uncertainty is an algorithm, AI output quality, an external service, or data behavior, validate that capability first. For backend-only or local tools, omit unnecessary frontend or network layers. Choose the order that resolves the biggest current uncertainty with the least work; do not create a new review gate just to select it.
 
 One module per context is a default organization technique, not an approval gate or a reason to create a large ceremony. A small module can be completed in one conversation. A large module should be split before implementation or upgraded to Controlled mode. When changing contexts, leave a compact handoff and let the next context continue from the approved baseline without reopening settled design decisions unless new evidence conflicts with them.
 
@@ -225,13 +249,15 @@ Current status
 
 The module note is a durable summary, not a duplicate task tracker. Internal implementation details belong in code unless they affect consumers or future decisions.
 
-## Contracts (On Demand)
+## Core API and Module Contracts
 
-Create `docs/contracts/<contract>.md` only when a capability is consumed across a meaningful module boundary. The contract should describe the current public obligation: inputs, outputs, errors, ownership, and compatibility rules.
+During baseline design, agree on the interfaces used by the MVP's core journey, including frontend/backend exchanges inside one business module. Reuse and check existing interfaces against their implementation. Do not invent a backend or network API where the product has none.
 
-The provider module owns the contract. Consumers depend on the contract, not the provider's internal files, private services, or tables. If a change affects product behavior, architecture, or a public contract, update the relevant authoritative doc before proceeding.
+Describe the operation and owner, endpoint/method or callable boundary, input/output shapes and field meanings, required fields, relevant access rules, and success/error examples. Include pagination, asynchronous states, retry or duplicate-submission behavior only where applicable. This must be enough to implement and test both sides without guessing core behavior; private schemas and future endpoints can wait.
 
-Do not create a contract file for every internal function or small local component.
+Keep one authoritative definition. Use the project's existing interface schema (such as OpenAPI) if present; otherwise a short section in `docs/spec.md` or `docs/contracts/api.md` is sufficient. Split into `docs/contracts/<contract>.md` only when useful. The architecture links to interface owners and definitions; module notes reference them instead of copying field lists.
+
+The provider owns the interface. Consumers use its public surface, not private files, services, or tables. When an interface changes, update its authority, affected consumers, mocks, and relevant tests together. Material product or compatibility changes follow Scope Changes and Rework; implementing an already approved contract does not require another approval. A small stable interface does not by itself require OpenSpec.
 
 ## Tool Selection
 
@@ -287,6 +313,8 @@ Update `architecture.md` when module boundaries, dependencies, data ownership, d
 
 Update `tech-stack.md` when a meaningful technology or deployment decision changes.
 
+Update the interaction section or `docs/design.md` when agreed user behavior changes, and the authoritative interface definition when exchanges change. Keep both consistent with product scope and actual implementation.
+
 Update `progress.md` when a module starts, reaches a meaningful outcome, tests pass or fail, a blocker appears, or the next step changes.
 
 Update `decisions.md` when a durable tradeoff or constraint is settled.
@@ -306,7 +334,7 @@ Testing is part of module implementation, but test depth should match risk:
 
 If the project has no automated test harness, use the smallest reliable verification available and state the limitation. Add a test framework only when its value justifies the setup cost; do not turn a small MVP module into a tooling project solely to satisfy this skill.
 
-Do not require a full regression suite after every tiny edit. Before MVP acceptance, run the available test suite, build checks, and the complete core user journey. Record known gaps rather than disguising them as completion.
+Do not require a full regression suite after every tiny edit. Before MVP acceptance, run the available test suite, build checks, and the complete core user journey. When the journey relies on a backend, persistence, or external integration, demonstrate that connection and any required persistence; a mock-only demo is not evidence of full completion. If a real dependency is unavailable, report the result as partial and identify the unverified path. Record known gaps rather than disguising them as completion.
 
 MVP completion means:
 
