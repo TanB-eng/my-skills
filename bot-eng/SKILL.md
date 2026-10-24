@@ -120,11 +120,25 @@ Discuss:
 - data flow, risks, and unresolved assumptions
 - material time, API, hosting, or operating-cost constraints
 
+### Guided PRD Discovery
+
+When discovering a new project's requirements, resolving material gaps in existing requirements, or redefining product scope, read the built-in [PRD template](references/prd-template.md) and use it to guide the discussion, draft, and readiness assessment. For an existing PRD, preserve its structure and resolve only consequential gaps; do not restart discovery during ordinary module work or a bounded fix.
+
 Start with a concise PRD draft or the product section of `docs/spec.md` before elaborating implementation details. Capture the core screens or operations, user pain, MVP boundaries, acceptance outcomes, and main risks. Mark preliminary technical ideas and unverified demand, competitor, or cost claims as assumptions; use evidence when those claims drive a decision. A small internal tool does not need a market report or a detailed cost model unless the decision depends on one.
+
+Treat the template as a coverage guide: adapt or omit inapplicable sections and examples instead of requiring every heading or table. Do not add product features merely to fill it. Keep the reusable template in the skill; write the project's actual requirements into its existing PRD or combined spec.
 
 Present the proposed direction in plain language so the user can correct it. Do not treat a vague acknowledgement as approval of an unshown document.
 
-Separate user requirements, repository or experimental evidence, and unverified assumptions. Ask only questions whose answers materially affect scope, core interactions, architecture, risk, or acceptance. Resolve technical questions through available evidence first; explain consequential choices to the user. Avoid repeating answered questions or filling a question quota, but do not hide a blocking ambiguity just to stop asking.
+First extract what the user, attachments, and existing project facts already establish. Separate user requirements, repository or experimental evidence, and unverified assumptions. Ask focused questions in small relevant groups, prioritizing users and problem, the complete core journey, MVP and non-goals, then consequential rules, states, constraints, and acceptance. Offer concrete alternatives with reasons when they help the user choose. Ask only questions whose answers materially affect the next design step, scope, core interactions, architecture, risk, or acceptance; resolve technical questions through available evidence first. Avoid repeating answered questions, dumping the whole template as a questionnaire, or filling a question quota, but do not hide a blocking ambiguity just to stop asking.
+
+Update the project PRD as meaningful answers are settled, so the user can review the current result without reconstructing the conversation. Record unresolved matters with their impact, the stage they block, and the validation or clarification needed. Leave detailed visual, database, and API design to their relevant authorities, while keeping product constraints here. Incorporate agreed prototype feedback into the same PRD.
+
+Before handing requirements to prototyping, use the template's readiness checks and report a compact conclusion: ready for prototyping, ready under stated bounded assumptions, or needs clarification. Ground it in the actual draft, name remaining blockers or assumptions, and state the next action. For a backend or CLI project, assess readiness for its input/output and interaction design rather than requiring a UI. Do not make an unknown that could invalidate the MVP disappear merely because a mock screen can be built.
+
+This product readiness summary feeds Global Baseline Review; it adds no separate approval stage and does not authorize a runnable prototype or product implementation. Follow the existing authorization rules and confirm the combined baseline once. Mark requirements as approved only when the user has actually approved the presented scope; document completeness is not evidence of validated demand.
+
+### Baseline Documents
 
 Create only the documents that carry useful information. A typical medium or large greenfield project uses:
 
@@ -156,6 +170,24 @@ Keep new planning and progress files under `docs/`, preserving existing names an
 For a product with unclear user interactions, use a simple sketch, screen outline, or existing UI reference to walk through the core journey. Show the relevant actions, input, result, and important loading, empty, and error states. For a backend or CLI project, use request/response or input/output examples instead. Skip new prototypes when the interactions are already clear; visual polish is not a prerequisite.
 
 For a UI product, reuse its design system or derive a compact visual direction from the user's references: layout and information density, color and typography, reusable components, responsive behavior, and important interaction states. If neither exists, propose a simple direction suited to the core workflow. Capture only decisions needed for consistent implementation. Use sketches or the available design tools; do not require Figma, a particular site, a complete component library, or pixel-perfect screens before MVP work.
+
+### Optional UI Inspiration and Prototyping Resources
+
+When establishing a UI direction, proactively offer the following optional resources and explain their different roles. Invite the user to share links, screenshots, or Figma frames and say what they like or want to avoid. Reuse an existing direction when it is sufficient; do not repeat this invitation for every module or conversation.
+
+| Resource | Useful role |
+| --- | --- |
+| [Dribbble](https://dribbble.com/) | Explore visual references for layout, colors, typography, and component treatments. Check that attractive presentation shots also suit the actual workflow and states. |
+| [Linear](https://linear.app/) | Study a real work-focused product for information density, navigation, hierarchy, and interaction patterns; it is a product reference, not an inspiration gallery. |
+| [v0](https://v0.app/) | Explore and iterate UI prototypes from a brief or visual references; treat generated code as a candidate to review, not an approved production architecture. |
+| [Figma Make](https://www.figma.com/make/) | Explore interactive prototypes using product and design context. Label mock behavior and keep runnable work within the existing prototype authorization. |
+| [Figma AI](https://www.figma.com/ai/) | Explore and refine design directions with AI-assisted design tools; use only capabilities available in the user's environment. |
+
+When preparing a brief for these tools, include the relevant PRD scope, core screens and journey, important states, target devices, existing design constraints, and selected references with what to borrow or avoid. Exclude secrets and unnecessary private data. Do not ask a prototype tool to invent business rules or expand the MVP from a reference design.
+
+Extract a compact direction from chosen references: overall feel, layout and density, colors and typography, component styling, responsive behavior, interaction states, and patterns to avoid. Record settled choices in the existing design/spec authority and feed agreed business changes back into the PRD. Borrow suitable patterns rather than copying another product's branding or assets.
+
+These are suggestions, not mandatory tools or a new phase. Do not require accounts, paid usage, browsing every site, reference collection, or additional approval to choose a direction. If the user has no references or prefers to skip them, propose a simple domain-appropriate direction and continue within the current authorization. Backend and CLI work do not need this step.
 
 Walk the prototype through the actual user journey. If a screen exposes a missing rule, awkward flow, or unnecessary feature, revise the product draft and affected design or interface facts together. Resolve material choices with the user in baseline discussion; after approval, material changes follow Scope Changes and Rework.
 

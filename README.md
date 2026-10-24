@@ -124,6 +124,7 @@ openspec/changes/<change-id>/
 Use $bot-eng in MVP mode. Do not write code yet.
 Start with a concise PRD draft: problem, users, current alternatives, product form,
 core journey, MVP, non-goals, constraints, risks, and acceptance criteria.
+Use the built-in PRD template to guide focused questions and keep the draft current.
 Refine interactions and visual direction with references or sketches where needed.
 Agree on architecture, technology, modules, and core interfaces; update the draft
 when the prototype reveals product gaps.
@@ -146,11 +147,31 @@ AI 应与你反复讨论并梳理：
 
 先形成简短 PRD 草稿或 `docs/spec.md` 的产品部分，再展开实现细节。记录核心页面或操作、用户痛点、MVP 范围、验收结果和主要风险；技术设想、需求、竞品或成本等未验证判断标记为假设。只有决策确实依赖时才深入调查，不给每个小项目强加竞品报告和成本模型。
 
+Skill 内置 [PRD 模板](bot-eng/references/prd-template.md)。新项目梳理需求时，AI 会读取模板，先整理已有信息，再分组追问关键缺口，优先明确用户与问题、完整核心路径、MVP 与非目标，然后补足影响结果的规则、状态、约束和验收标准。必要时给出选项与理由，讨论结论及时更新到项目 PRD。
+
+模板用于查漏补缺，不要求一次回答全部问题或填满所有章节，也不会因为模板举了权限、上传等例子就增加相应功能。未知项记录影响、阻碍阶段和验证方式；已有可靠 PRD 的项目保留原结构，普通模块续做不重跑需求问卷。
+
+交给原型设计前，AI 根据实际草稿给出“可制作原型 / 带明确假设可制作原型 / 需要澄清”的简短结论、依据和下一步。纯后端或命令行项目以输入输出设计为目标。此结论纳入现有项目基线审查，不新增审批，也不代替原型或正式开发所需授权；原型反馈中确认过的业务调整继续回写同一份 PRD。
+
 AI 应区分你的明确要求、已有代码或实验提供的证据、尚未验证的假设。优先调查能自行查证的问题，只追问会影响产品范围、核心交互、架构、风险或验收的选择；不为了凑问题数量而追问，也不因达到问题数量上限就忽略阻碍。
 
 交互尚不清楚时，先展示简洁原型或页面草图，覆盖关键操作以及相关的加载、空数据和错误状态。已有明确界面时可复用；纯后端或命令行项目用输入输出示例代替，不必生成 UI。视觉精修可以后置。
 
 有界面的项目优先复用既有设计系统，或从你提供的参考中提炼布局与信息密度、颜色、字体、组件、响应式和交互状态。两者都没有时，由 AI 提出适合核心流程的简洁方向。只记录实现一致性需要的设计决定，不强制 Figma、特定网站或完整组件库。
+
+确定 UI 方向时，Skill 会主动提示这些可选资源，并区分灵感来源和原型工具：
+
+| 资源 | 适合用途 |
+| --- | --- |
+| [Dribbble](https://dribbble.com/) | 寻找布局、配色、字体和组件样式灵感；展示图仍需检查实际流程与状态是否完整 |
+| [Linear](https://linear.app/) | 参考真实工作型产品的信息密度、导航、层级和交互，不把它当成素材网站 |
+| [v0](https://v0.app/) | 根据需求或参考探索、迭代 UI 原型，生成代码仍需审查和真实联调 |
+| [Figma Make](https://www.figma.com/make/) | 结合产品与设计上下文制作交互原型，标明模拟行为 |
+| [Figma AI](https://www.figma.com/ai/) | 使用当前环境可用的 AI 设计能力探索和细化视觉方向 |
+
+你可以提供链接、截图或 Figma 页面，并说明喜欢什么、避免什么。AI 会提炼整体风格、布局与密度、配色字体、组件样式、响应式及交互状态，写入现有设计说明或规格；确认过的业务变化回写 PRD，不为参考另建一套重复文档。
+
+交给原型工具时，AI 会整理相关 PRD 范围、核心页面与路径、重要状态、目标设备、既有设计约束和参考中要借鉴或避免的点，不夹带密钥或无关隐私数据，也不让参考图扩大 MVP。上述资源都不是必经步骤，不要求注册、付费或逐个访问；已有明确设计时直接复用，没有参考时由 AI 提出简洁方向，不在每个模块重复询问。可运行原型仍遵守既有授权边界，纯后端或命令行项目跳过 UI 部分。
 
 用原型走一遍真实用户路径，发现流程不顺、规则遗漏或多余功能时，同步修订 PRD 和相关设计、接口约定；重大选择在基线讨论中解决。原型能说明交互和外观，不能代替技术可行性或真实联调证据。
 
@@ -434,6 +455,8 @@ cp -R my-skills/bot-eng "${CODEX_HOME:-$HOME/.codex}/skills/bot-eng"
 ```text
 bot-eng/
   SKILL.md
+  references/
+    prd-template.md
   agents/
     openai.yaml
 ```
