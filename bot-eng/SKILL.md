@@ -9,6 +9,18 @@ BoT_eng is a lightweight, spec-first method for building software with AI. It ke
 
 The default goal is a working MVP. Make the process stricter only when complexity, risk, or the user's preference justifies it.
 
+## Workflow at a Glance
+
+| Stage | Working result |
+| --- | --- |
+| Product positioning | A concise PRD draft covering the problem, current alternatives, core journey, MVP, non-goals, constraints, and acceptance outcomes. |
+| Interaction and visual direction | Relevant screens or input/output examples, important states, and enough design guidance to implement consistently. Feed discoveries back into the product draft. |
+| Development baseline | Reconcile product, design, business modules, technology, data ownership, and core interfaces in `docs/`; assess readiness and present the baseline for one approval. |
+| Small-step implementation | Work through an ordered task queue within serial business modules, test and integrate real components, apply the five completion checks, and retain verified Git checkpoints when authorized. |
+| MVP acceptance and delivery | Validate the full core journey, reconcile docs with the actual implementation, prepare usable setup and delivery instructions, and present evidence and gaps for acceptance. Deploy only within the requested scope. |
+
+These stages can loop back as evidence changes. Reuse settled work, omit inapplicable UI or deployment work, and avoid adding an approval between each stage. A prototype clarifies behavior and appearance; it does not prove technical feasibility or a working integration.
+
 ## Core Principles
 
 1. Clarify the product and MVP before construction.
@@ -75,6 +87,8 @@ Verification
 
 This is a progress update, not an approval request. Continue implementation unless the user asks to pause or a real escalation condition appears.
 
+Include any important existing behavior that must be preserved in the scope. For later small tasks within the module, refer back to that context and state only changes to the goal, affected area, invariants, or verification method.
+
 Surface runnable results at meaningful checkpoints, especially the first end-to-end slice, so the user can redirect early. Treat the demonstration as feedback opportunity, not a mandatory stop, unless the user requests a checkpoint.
 
 Do not create detailed task cards, requirement IDs, traceability tables, or file-scope manifests for a simple module. Add them only when their absence would create meaningful ambiguity, coordination risk, audit needs, or expensive rework. If a short explanation in the conversation is enough, do not persist another artifact.
@@ -94,6 +108,8 @@ Explore the user's intent and prepare a concise project baseline before product 
 Discuss:
 
 - problem and target users
+- how users solve it today, the shortcomings, and relevant alternatives or differentiation
+- product form and delivery context, such as a website, local tool, plugin, or internal service
 - core user journey
 - MVP capabilities
 - explicit non-goals
@@ -102,6 +118,9 @@ Discuss:
 - technology route and tradeoffs
 - business modules and their order
 - data flow, risks, and unresolved assumptions
+- material time, API, hosting, or operating-cost constraints
+
+Start with a concise PRD draft or the product section of `docs/spec.md` before elaborating implementation details. Capture the core screens or operations, user pain, MVP boundaries, acceptance outcomes, and main risks. Mark preliminary technical ideas and unverified demand, competitor, or cost claims as assumptions; use evidence when those claims drive a decision. A small internal tool does not need a market report or a detailed cost model unless the decision depends on one.
 
 Present the proposed direction in plain language so the user can correct it. Do not treat a vague acknowledgement as approval of an unshown document.
 
@@ -121,7 +140,7 @@ docs/
 The files have these roles:
 
 - `PRD.md`: product problem, users, core journey, MVP, non-goals, and acceptance criteria.
-- `architecture.md`: architecture skeleton, business modules, order, dependencies, data ownership, and important cross-module rules.
+- `architecture.md`: architecture skeleton, relevant directory layout, business modules and order, dependencies, core data models and ownership, service boundaries, and invariants that changes must preserve. Link to authoritative technology and interface details.
 - `tech-stack.md`: selected technologies, constraints, and reasons.
 - `progress.md`: current state, completed work, tests, blockers, and next step.
 - `decisions.md`: durable decisions that would otherwise be reconsidered.
@@ -130,9 +149,15 @@ A smaller MVP may combine product, architecture, and technology choices in `docs
 
 Do not create empty files or detailed notes for every future module. Capture the core interactions and necessary interface agreements during baseline design; defer unrelated interfaces and module implementation details.
 
+Keep new planning and progress files under `docs/`, preserving existing names and casing such as `DESIGN.md` or `ARCHITECTURE.md`. Product, design, architecture, and technology are information responsibilities, not a mandatory number of files. Link to existing authorities rather than creating duplicate versions or copying the same rules into several documents.
+
 ## Interaction and Interface Design
 
 For a product with unclear user interactions, use a simple sketch, screen outline, or existing UI reference to walk through the core journey. Show the relevant actions, input, result, and important loading, empty, and error states. For a backend or CLI project, use request/response or input/output examples instead. Skip new prototypes when the interactions are already clear; visual polish is not a prerequisite.
+
+For a UI product, reuse its design system or derive a compact visual direction from the user's references: layout and information density, color and typography, reusable components, responsive behavior, and important interaction states. If neither exists, propose a simple direction suited to the core workflow. Capture only decisions needed for consistent implementation. Use sketches or the available design tools; do not require Figma, a particular site, a complete component library, or pixel-perfect screens before MVP work.
+
+Walk the prototype through the actual user journey. If a screen exposes a missing rule, awkward flow, or unnecessary feature, revise the product draft and affected design or interface facts together. Resolve material choices with the user in baseline discussion; after approval, material changes follow Scope Changes and Rework.
 
 Refine the interaction, architecture, and core interface agreements together. Define the exchanges needed by the MVP journey before the frontend and backend implement them; see Core API and Module Contracts below. Account for business rules and data ownership, rather than inventing one endpoint for every button. Technical constraints may require revising the interaction.
 
@@ -213,14 +238,14 @@ After the baseline is approved, implement the smallest useful vertical slice. Fo
 For each module:
 
 1. Read the current baseline and interactions, module note and relevant contracts if present, repository state, and dependency modules' public outputs.
-2. Check the module's goal, boundary, dependencies, acceptance outcome, and assumptions due for validation. For a low-risk module, briefly state its goal, scope, and verification method, then continue without waiting for approval.
+2. Check the module's goal, boundary, dependencies, behavior to preserve, acceptance outcome, and assumptions due for validation. For a low-risk module, briefly state its goal, scope, and verification method, then continue without waiting for approval.
 3. Create `docs/modules/<module>.md` only if the module needs durable detail beyond the baseline.
 4. Decide whether MVP mode is sufficient or whether this module should be upgraded to Controlled mode.
-5. Implement the smallest behavior that advances the core journey, using the order described below.
+5. Use the current task queue to implement one small, verifiable outcome at a time, using the order described below.
 6. Add or update focused tests alongside implementation for the behavior and important failure paths.
 7. Connect the real components and run focused tests and relevant integration checks, including affected existing behavior; capture the results.
 8. Apply Completion Check as one integrated review. Fix in-scope defects, rerun affected checks, and record the outcome in `docs/progress.md`; update other docs only when project facts changed.
-9. Move to the next module after the current MVP outcome passes the review. A partial or blocked result is not completion; identify the remaining work and any dependency on it.
+9. Preserve a verified Git checkpoint when authorized, then move to the next module after the current MVP outcome passes the review. A partial or blocked result is not completion; identify the remaining work and any dependency on it.
 
 For a UI-driven module with understood technical dependencies, the default order is frontend interaction (using clearly identified mock data if needed), backend logic and persistence, then real integration. Keep both sides aligned with the agreed interface and test while building. Do not finish all modules' frontend implementations before integrating any backend.
 
@@ -229,6 +254,22 @@ When the main uncertainty is an algorithm, AI output quality, an external servic
 One module per context is a default organization technique, not an approval gate or a reason to create a large ceremony. A small module can be completed in one conversation. A large module should be split before implementation or upgraded to Controlled mode. When changing contexts, leave a compact handoff and let the next context continue from the approved baseline without reopening settled design decisions unless new evidence conflicts with them.
 
 Do not start the next module until the active module's tests, progress entry, public outputs, and necessary handoff facts are current. If a later module needs an earlier module's internals, stop and repair the boundary or contract before continuing.
+
+## Small Steps and Task State
+
+After baseline approval, keep a short, dependency-ordered queue in `docs/progress.md`. Describe the module order and only the actionable tasks needed now; refine later modules as they approach. A task should produce an observable outcome, with a goal, affected scope, relevant invariants, and a way to verify it, not a separate ticket for every file or function.
+
+Use one authoritative task list. Reuse an existing TODO or issue tracker; use `docs/TODO.md` only if the queue outgrows progress notes. If OpenSpec supplies the module's tasks, reference them instead of maintaining duplicate checkboxes. `progress.md` still records the current result, evidence, blocker, and next action.
+
+Keep one implementation task active at a time and mark it done only after its verification succeeds. Work through subsequent authorized tasks automatically; task transitions are not user approval gates or mandatory commits. If evidence changes the dependency order, update the queue and explain the reason; discuss changes to the approved scope under the existing rules. A finished task does not establish module completion until Completion Check passes.
+
+## Git Checkpoints
+
+Follow the user's repository and commit policy. At a verified module boundary, create a local checkpoint commit when authorized. Inspect the working tree and staged changes first; stage only the relevant files or hunks, preserve other work, and do not include unrelated staged changes. Include relevant docs and tests with the implementation. Keep the commit reference in the handoff or subsequent progress update, avoiding a self-referential commit-id edit.
+
+If the project has no Git repository, commits are not authorized, or a checkpoint fails, record the verified state and checkpoint status. Offer a scoped next action without turning every module into another permission request or treating a missing commit as a failed functional check. A checkpoint is useful for comparison and recovery, but does not prove that the code passed verification.
+
+When a later change breaks behavior, compare it with the verified checkpoint and prefer a focused fix or an authorized scoped revert. Do not discard user work, reset the whole tree, rewrite history, or bypass hooks to recover. Local checkpointing does not authorize pushing, publishing, or deploying.
 
 ## Module Notes (On Demand)
 
@@ -329,7 +370,7 @@ Testing is part of module implementation, but test depth should match risk:
 
 - focused unit or feature tests for local behavior
 - integration tests at meaningful module boundaries
-- a small smoke path for each critical MVP capability
+- a small smoke path for each critical MVP capability, including relevant loading, empty, and failure states for UI flows
 - full core-journey validation before calling the MVP usable
 
 If the project has no automated test harness, use the smallest reliable verification available and state the limitation. Add a test framework only when its value justifies the setup cost; do not turn a small MVP module into a tooling project solely to satisfy this skill.
@@ -345,6 +386,16 @@ MVP completion means:
 - remaining polish and non-MVP work is explicitly listed
 
 Do not delay MVP for visual polish, speculative abstractions, rare edge cases, or future scale that is not part of the agreed hypothesis.
+
+## Delivery Reconciliation
+
+Before final MVP acceptance or a requested release, compare the actual code, configuration, and verified commands with the baseline. Update the relevant architecture or combined spec with the real module and directory structure, data and service boundaries, setup and delivery method, and environment-variable names and purposes. Keep secret values out of docs. Link to existing configuration references rather than duplicating them.
+
+Maintain a usable root `README.md` with the implemented purpose, prerequisites, setup and configuration, run and verification commands, known limitations, and deployment or installation instructions where applicable. Check commands against the actual project scripts and record what was exercised; distinguish documented plans from verified behavior. This is a final consistency pass over continuously maintained docs, not a reason to defer updates during development.
+
+If actual code deviates from approved scope or architecture, expose and resolve the deviation under Scope Changes and Rework; do not rewrite requirements to make an accidental implementation appear approved. Reuse the final tests and five-dimension evidence rather than adding a duplicate audit or another mandatory approval.
+
+Present the working core journey, verification evidence, remaining gaps, and delivery state for final acceptance. Keep local usability, user acceptance, and deployment status distinct. Run a relevant smoke check on the target after an authorized deployment when possible; report an unavailable target as unverified, not successful. For a local or backend-only tool, provide its appropriate usage or input/output demonstration instead of inventing a hosted UI. Feed subsequent user feedback into the next bounded iteration and update the affected docs.
 
 ## Scope Changes and Rework
 
