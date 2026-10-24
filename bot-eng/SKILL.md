@@ -200,7 +200,7 @@ A useful module has:
 
 Each persistent data set or stateful capability has one clear owner. Other modules should write through the owner's public interface rather than reaching into its private tables or services. A pragmatic MVP shortcut is acceptable only when it is visible, locally contained, and does not make the boundary misleading.
 
-Do not split a module just because it contains frontend and backend code. Split when there are separate business goals, lifecycles, owners, or acceptance outcomes.
+Group closely related features around one business goal; a module may contain several features. Do not split a module just because it contains frontend and backend code. Split when there are separate business goals, lifecycles, owners, or acceptance outcomes.
 
 Cross-cutting foundations such as project setup, deployment, observability, or a shared design system may be explicit prerequisites or shared infrastructure. Do not present them as user-value modules, and create them only when the current MVP needs them, with a narrow owner and surface.
 
@@ -218,9 +218,9 @@ For each module:
 4. Decide whether MVP mode is sufficient or whether this module should be upgraded to Controlled mode.
 5. Implement the smallest behavior that advances the core journey, using the order described below.
 6. Add or update focused tests alongside implementation for the behavior and important failure paths.
-7. Connect the real components and run focused tests and relevant integration checks, including affected existing behavior; fix failures before moving on.
-8. Update `progress.md` and update other docs only when project facts changed.
-9. Move to the next module after the current outcome is usable and evidenced.
+7. Connect the real components and run focused tests and relevant integration checks, including affected existing behavior; capture the results.
+8. Apply Completion Check as one integrated review. Fix in-scope defects, rerun affected checks, and record the outcome in `docs/progress.md`; update other docs only when project facts changed.
+9. Move to the next module after the current MVP outcome passes the review. A partial or blocked result is not completion; identify the remaining work and any dependency on it.
 
 For a UI-driven module with understood technical dependencies, the default order is frontend interaction (using clearly identified mock data if needed), backend logic and persistence, then real integration. Keep both sides aligned with the agreed interface and test while building. Do not finish all modules' frontend implementations before integrating any backend.
 
@@ -354,13 +354,22 @@ For an ordinary bug, reproduce it, add a focused test, fix it, and run the relev
 
 ## Completion Check
 
-Before claiming a module or MVP is complete, verify:
+Use these five dimensions when defining the module boundary and verification method, then review them together before claiming completion. Within the approved scope and available authorization, the AI performs this review, fixes defects, and rechecks affected evidence automatically. It is part of the module loop, not another user approval gate; existing scope-change and OpenSpec gates still apply.
 
-- the implemented behavior matches the current product and architecture facts
-- the module's acceptance outcome is demonstrated
-- focused tests and relevant integration checks ran
-- the core user journey remains usable when applicable
-- progress and any durable decisions are recorded
-- public contracts or architecture docs are updated when they changed
-- optional planning artifacts are reconciled when a stricter mode was used
-- remaining gaps are explicit and not hidden behind a "complete" label
+| Dimension | Required evidence for the current MVP outcome |
+| --- | --- |
+| Functional correctness | Behavior matches the current spec and acceptance criteria. Focused checks cover the core path, important failures, and affected existing behavior; key business rules can be verified independently where practical. |
+| Clear boundaries | Related business rules are cohesive; data and rules have clear owners. Review actual dependencies and public-interface usage for low coupling, hidden cycles, and private-data access. Explain the change's affected consumers and verification scope. |
+| Real integration | Run the real UI, backend, persistence, and necessary external connections that the outcome actually uses. Check required data retention and the relevant available user journey; mock-only results cannot prove a real dependency works. Omit components the project does not need. |
+| Diagnosable failures | Important failures provide useful error context through appropriate responses, logs, or existing diagnostics, enough to locate the failing operation or boundary. Use evidence from exercised failure paths. |
+| Continuity | Record the outcome, verification commands or steps and observed results, remaining gaps, and next action. Synchronize changed authoritative facts, durable decisions, and any stricter-mode artifacts; leave enough context for a new conversation to continue. |
+
+Architecture qualities require code and dependency review; passing tests alone does not establish cohesion or low coupling. Judge the agreed MVP scope: necessary dependencies and changes across modules are acceptable when ownership, direction, and impact are clear. Do not require zero coupling, fixed scores, new infrastructure, or a separate report for each dimension.
+
+Keep one compact result in `docs/progress.md`, linking to evidence instead of copying it. Use an existing module note only when useful; do not create a new document just for this review:
+
+- Passed: the current outcome is usable and all applicable dimensions have evidence; explicitly justify any inapplicable dimension.
+- Partially complete: behavior or required verification is still missing, including an unavailable real dependency. Name the unverified path, its impact, and how to complete verification; do not present dependent behavior as verified.
+- Blocked: a concrete dependency, authorization, or unresolved decision prevents completion. Record the blocker and next action without claiming the module is done.
+
+Fix defects that invalidate the current acceptance outcome or its evidence before marking Passed. Recheck only affected areas unless broader testing is required by the risk. Keep non-blocking polish and future work explicit without delaying the agreed MVP; escalate material scope or architecture changes under Scope Changes and Rework. MVP completion also requires the full core-journey validation described in Testing and MVP Convergence.
